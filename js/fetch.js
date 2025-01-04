@@ -182,7 +182,25 @@ function modify_data(){
 }
 
 // Delete student record
-
+function deleteRecord(id){
+	if(confirm("Are you sure want to Delete this record ?")){
+		fetch('php/fetch-delete.php?delId=' + id,{
+			method : 'DELETE'
+		})
+		.then((response) => response.json())
+		.then((result)=>{
+				if(result.delete == 'success'){
+					show_message('success','Deleted Successfully.');
+					loadTable();
+				}else{
+					show_message('error',"Can't Delete Data.");
+				}
+		})
+		.catch((error) => {
+			show_message('error',"Data not Deleted.");
+		});
+	}
+}
 
 // Search student record
 
