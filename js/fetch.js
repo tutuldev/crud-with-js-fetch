@@ -103,10 +103,83 @@ function submit_data(){
 }
 
 // Open Update Modal Box and show Student record in it.
+function editRecord(id){
+	var editModal = document.getElementById("modal");
+	editModal.style.display = 'block';
 
+	fetch('php/fetch-edit.php?editId=' + id)
+	.then((response) => response.json())
+	.then((data)=>{
+		var option = '';
+		for(var i in data['response']){
+			document.getElementById('edit-id').value = data['response'][i].id;
+			document.getElementById('edit-fname').value = data['response'][i].first_name;
+			document.getElementById('edit-lname').value = data['response'][i].last_name;
+			document.getElementById('edit-city').value = data['response'][i].city;
+
+			var selected = '';
+			for(var j in data['class']){
+				if(data['class'][j].cid === data['response'][i].id){
+					selected = 'selected';
+				}else{
+					selected = '';
+				}
+				option += `<option ${selected} value="${data['class'][j].cid}">${data['class'][j].class_name}</option>`;
+			}
+
+			document.getElementById('edit-class').innerHTML = option;
+		}
+	})
+	.catch((error) => {
+		show_message('error',"Can't Fetch Data");
+	});
+}
 
 // Update student record
+function modify_data(){
+	var id = document.getElementById('edit-id').value;
+	var fname = document.getElementById('edit-fname').value;
+	var lname = document.getElementById('edit-lname').value;
+	var sClass = document.getElementById('edit-class').value;
+	var city = document.getElementById('edit-city').value;
 
+	if(fname === '' || lname === '' || sClass === '0' || city === ''){
+		alert('Please Fill All The Fields');
+		return false;
+	}else{
+		var formdata = {
+			's_id' : id,
+			'fname' : fname,
+			'lname' : lname,
+			'class' : sClass,
+			'city' : city
+		}
+
+		jsondata = JSON.stringify(formdata);
+
+		fetch('php/fetch-update.php',{
+			method : 'PUT',
+			body : jsondata,
+			headers: {
+				'Content-type' : 'application/json',
+			}
+		})
+		.then((response) => response.json())
+		.then((result)=>{
+				if(result.update == 'success'){
+					show_message('success','Data Updated Successfully.');
+					loadTable();
+					hide_modal();
+				}else{
+					show_message('error',"Data Can't Updated.");
+					hide_modal();
+				}
+		})
+		.catch((error) => {
+			show_message('error',"Data Can't Updated : Server Problem.");
+		});
+	}
+}
 
 // Delete student record
 
