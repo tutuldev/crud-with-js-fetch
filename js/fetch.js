@@ -203,7 +203,38 @@ function deleteRecord(id){
 }
 
 // Search student record
-
+function load_search(){
+	var search = document.getElementById('search').value;
+	if(search === ''){
+		loadTable();
+		return false;
+	}else{
+	fetch('php/fetch-search.php?search=' + search)
+	.then((response) => response.json())
+	.then((data)=>{
+		var tbody = document.getElementById('tbody');
+		if(data['empty']){
+			tbody.innerHTML = '<tr><td colspan="6" align="center"><h3>No Record Found.</h3></td></tr>'
+		}else{
+			var tr = '';
+			for(var i in data){
+				tr += `<tr>
+		            <td align="center">${data[i].id}</td>
+		            <td>${data[i].first_name} ${data[i].last_name}</td>
+		            <td>${data[i].class_name}</td>
+		            <td>${data[i].city}</td>
+		            <td align="center"><button class="edit-btn" onclick="editRecord(${data[i].id})">Edit</button></td>
+		            <td align="center"><button class="delete-btn" onclick="deleteRecord(${data[i].id})">Delete</button></td>
+		          </tr>`;
+			}
+			tbody.innerHTML = tr;
+		}
+	})
+	.catch((error) => {
+		show_message('error',"Can't Fetch Data");
+	});
+	}
+}
 
 //show error / success message
 function show_message(type,text){
